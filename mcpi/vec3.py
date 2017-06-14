@@ -16,7 +16,7 @@ class Vec3:
         return self
 
     def length(self):
-        return self.lengthSqr ** .5
+        return self.lengthSqr() ** .5
 
     def lengthSqr(self):
         return self.x * self.x + self.y * self.y  + self.z * self.z
@@ -63,6 +63,12 @@ class Vec3:
         dz = self.z - rhs.z
         if dz != 0: return dz
         return 0
+
+    def __eq__(self, rhs):
+        if self.x == rhs.x and self.y == rhs.y and self.z == rhs.z:
+            return True
+
+        return False
 
     def iround(self): self._map(lambda v:int(v+0.5))
     def ifloor(self): self._map(int)

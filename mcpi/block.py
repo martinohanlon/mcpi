@@ -7,6 +7,9 @@ class Block:
     def __cmp__(self, rhs):
         return hash(self) - hash(rhs)
 
+    def __eq__(self, rhs):
+        return self.id == rhs.id and self.data == rhs.data
+
     def __hash__(self):
         return (self.id << 8) + self.data
 

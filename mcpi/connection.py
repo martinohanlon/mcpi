@@ -1,7 +1,7 @@
 import socket
 import select
 import sys
-from util import flatten_parameters_to_string
+from .util import flatten_parameters_to_bytestring
 
 """ @author: Aron Nieminen, Mojang AB"""
 
@@ -29,12 +29,25 @@ class Connection:
             sys.stderr.write(e)
 
     def send(self, f, *data):
-        """Sends data. Note that a trailing newline '\n' is added here"""
-        s = "%s(%s)\n"%(f, flatten_parameters_to_string(data))
-        #print "f,data:",f,data
-        #print "s",s
+        """
+        Sends data. Note that a trailing newline '\n' is added here
+
+        The protocol uses CP437 encoding - https://en.wikipedia.org/wiki/Code_page_437
+        which is mildly distressing as it can't encode all of Unicode.
+        """
+
+        s = b"".join([f, b"(", flatten_parameters_to_bytestring(data), b")", b"\n"])
+
+        self._send(s)
+
+    def _send(self, s):
+        """
+        The actual socket interaction from self.send, extracted for easier mocking
+        and testing
+        """
         self.drain()
         self.lastSent = s
+
         self.socket.sendall(s)
 
     def receive(self):
