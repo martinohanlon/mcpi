@@ -10,7 +10,7 @@ except ImportError:
     import minecraft
     import block
     import util
-    
+
 from copy import deepcopy
 import time
 import math
@@ -616,128 +616,206 @@ class ShapeBlock():
         else:
             return (self.actualPos.x, self.actualPos.y, self.actualPos.z, self.blockType, self.blockData) == (other.actualPos.x, other.actualPos.y, other.actualPos.z, other.blockType, other.blockData)
 
-# rotation test
-if __name__ == "__main__2":
+class MinecraftTurtle:
 
-    #connect to minecraft
-    mc = minecraft.Minecraft.create()
+    SPEEDTIMES = {0: 0, 10: 0.1, 9: 0.2, 8: 0.3, 7: 0.4, 6: 0.5, 5: 0.6, 4: 0.7, 3: 0.8, 2: 0.9, 1: 1}
 
-    #test shape
-    pos = mc.player.getTilePos()
-    pos.y += 40
+    def __init__(self, mc, position=minecraft.Vec3(0, 0, 0)):
+        # set defaults
+        self.mc = mc
+        # start position
+        self.startposition = position
+        # set turtle position
+        self.position = position
+        # set turtle angles
+        self.heading = 0
+        self.verticalheading = 0
+        # set pen down
+        self._pendown = True
+        # set pen block to black wool
+        self._penblock = block.Block(block.WOOL.id, 15)
+        # flying to true
+        self.flying = True
+        # set speed
+        self.turtlespeed = 6
+        # create turtle
+        self.showturtle = True
+        # create drawing object
+        self.mcDrawing = MinecraftDrawing(self.mc)
+        # set turtle block
+        self.turtleblock = block.Block(block.DIAMOND_BLOCK.id)
+        # draw turtle
+        self._drawTurtle(int(self.position.x), int(self.position.y), int(self.position.y))
 
-    myShape = MinecraftShape(mc, pos)
-    try:
-        #myShape.setBlocks(-3, 0, 0, 3, 0, 0, block.WOOL.id, 2)
-        #myShape.setBlocks(0, -3, 0, 0, 3, 0, block.WOOL.id, 3)
-        #myShape.setBlocks(0, 0, -3, 0, 0, 3, block.WOOL.id, 4)
-        print("draw shape")
-        myShape.setBlocks(-5, 0, -5, 3, 0, 3, block.WOOL.id, 5)
-        print("draw shape done")
-        
-        time.sleep(5)
-        roll = 0
-        pitch = 0
-        yaw = 0
+    def forward(self, distance):
+        # get end of line
+        # x,y,z = self._findTargetBlock(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading, distance)
+        x, y, z = self._findPointOnSphere(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading, distance)
+        # move turtle forward
+        self._moveTurtle(x, y, z)
 
-        #angles = [15,30,45,60,75,90]
-        angles = [45, 90]
+    def backward(self, distance):
+        # move turtle backward
+        # get end of line
+        # x,y,z = self._findTargetBlock(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading - 180, distance)
+        x, y, z = self._findPointOnSphere(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading - 180, distance)
+        # move turtle forward
+        self._moveTurtle(x, y, z)
 
-        print("roll shape")
-        for roll in angles:
-            myShape.rotate(yaw, pitch, roll)
-            print("roll shape {} done".format(roll))
-            time.sleep(1)
-        
-        for pitch in angles:
-            myShape.rotate(yaw, pitch, roll)
-            time.sleep(1)
+    def _moveTurtle(self, x, y, z):
+        # get blocks between current position and next
+        targetX, targetY, targetZ = int(x), int(y), int(z)
+        # if walking, set target Y to be height of world
+        if not self.flying:
+            targetY = self.mc.getHeight(targetX, targetZ)
+        currentX, currentY, currentZ = int(self.position.x), int(self.position.y), int(self.position.z)
 
-        for yaw in angles:
-            myShape.rotate(yaw, pitch, roll)
-            time.sleep(1)
+        # clear the turtle
+        if self.showturtle:
+            self._clearTurtle(currentX, currentY, currentZ)
 
-        for count in range(0,5):
-            myShape.moveBy(1,0,0)
-            time.sleep(0.5)
+        # if speed is 0 and flying, just draw the line, else animate it
+        if self.turtlespeed == 0 and self.flying:
+            # draw the line
+            if self._pendown:
+                self.mcDrawing.drawLine(currentX, currentY - 1, currentZ, targetX, targetY - 1, targetZ, self._penblock.id, self._penblock.data)
+        else:
+            blocksBetween = self.mcDrawing.getLine(currentX, currentY, currentZ, targetX, targetY, targetZ)
+            for blockBetween in blocksBetween:
+                # print blockBetween
+                # if walking update the y, to be the height of the world
+                if not self.flying:
+                    blockBetween.y = self.mc.getHeight(blockBetween.x, blockBetween.z)
+                # draw the turtle
+                if self.showturtle:
+                    self._drawTurtle(blockBetween.x, blockBetween.y, blockBetween.z)
+                # draw the pen
+                if self._pendown:
+                    self.mcDrawing.drawPoint3d(blockBetween.x, blockBetween.y - 1, blockBetween.z, self._penblock.id, self._penblock.data)
+                # wait
+                time.sleep(self.SPEEDTIMES[self.turtlespeed])
+                # clear the turtle
+                if self.showturtle:
+                    self._clearTurtle(blockBetween.x, blockBetween.y, blockBetween.z)
 
-        time.sleep(5)
-    finally:
-        myShape.clear()
-    
-# minecraft stuff testing
-if __name__ == "__main__":
+        # update turtle's position to be the target
+        self.position.x, self.position.y, self.position.z = x, y, z
+        # draw turtle
+        if self.showturtle:
+            self._drawTurtle(targetX, targetY, targetZ)
 
-    #connect to minecraft
-    mc = minecraft.Minecraft.create()
+    def right(self, angle):
+        # rotate turtle angle to the right
+        self.heading = self.heading + angle
+        if self.heading > 360:
+            self.heading = self.heading - 360
 
-    #test MinecraftDrawing
+    def left(self, angle):
+        # rotate turtle angle to the left
+        self.heading = self.heading - angle
+        if self.heading < 0:
+            self.heading = self.heading + 360
 
-    #clear area
-    mc.setBlocks(-25, 0, -25, 25, 25, 25, block.AIR.id)
+    def up(self, angle):
+        # rotate turtle angle up
+        self.verticalheading = self.verticalheading + angle
+        if self.verticalheading > 360:
+            self.verticalheading = self.verticalheading - 360
+        # turn flying on
+        if not self.flying:
+            self.flying = True
 
-    #create drawing object
-    mcDrawing = MinecraftDrawing(mc)
+    def down(self, angle):
+        # rotate turtle angle down
+        self.verticalheading = self.verticalheading - angle
+        if self.verticalheading < 0:
+            self.verticalheading = self.verticalheading + 360
+        # turn flying on
+        if not self.flying:
+            self.flying = True
 
-    #line
-    mcDrawing.drawLine(0,0,-10,-10,10,-5,block.STONE.id)
+    def setx(self, x):
+        self.setposition(x, self.position.y, self.position.z)
 
-    #circle
-    mcDrawing.drawCircle(-15,15,-15,10,block.WOOD.id)
+    def sety(self, y):
+        self.setposition(self.position.x, y, self.position.z)
 
-    #sphere
-    mcDrawing.drawSphere(-15,15,-15,5,block.OBSIDIAN.id)
-    
-    #face - solid triangle
-    faceVertices = []
-    faceVertices.append(minecraft.Vec3(0,0,0))
-    faceVertices.append(minecraft.Vec3(5,10,0))
-    faceVertices.append(minecraft.Vec3(10,0,0))
-    mcDrawing.drawFace(faceVertices, True, block.SNOW_BLOCK.id)
+    def setz(self, z):
+        self.setposition(self.position.x, self.position.y, z)
 
-    #face - wireframe square
-    faceVertices = []
-    faceVertices.append(minecraft.Vec3(0,0,5))
-    faceVertices.append(minecraft.Vec3(10,0,5))
-    faceVertices.append(minecraft.Vec3(10,10,5))
-    faceVertices.append(minecraft.Vec3(0,10,5))
-    mcDrawing.drawFace(faceVertices, False, block.DIAMOND_BLOCK.id)
+    def setposition(self, x, y, z):
+        # clear the turtle
+        if self.showturtle:
+            self._clearTurtle(self.position.x, self.position.y, self.position.z)
+        # update the position
+        self.position.x = x
+        self.position.y = y
+        self.position.z = z
+        # draw the turtle
+        if self.showturtle:
+            self._drawTurtle(self.position.x, self.position.y, self.position.z)
 
-    #face - 5 sided shape
-    faceVertices = []
-    faceVertices.append(minecraft.Vec3(0,15,0))
-    faceVertices.append(minecraft.Vec3(5,15,5))
-    faceVertices.append(minecraft.Vec3(3,15,10))
-    faceVertices.append(minecraft.Vec3(-3,15,10))
-    faceVertices.append(minecraft.Vec3(-5,15,5))
-    mcDrawing.drawFace(faceVertices, True, block.GOLD_BLOCK.id)
+    def setheading(self, angle):
+        self.heading = angle
 
-    #test MinecraftShape
-    playerPos = mc.player.getTilePos()
+    def setverticalheading(self, angle):
+        self.verticalheading = angle
+        # turn flying on
+        if not self.flying:
+            self.flying = True
 
-    #create the shape object
-    shapeBlocks = [ShapeBlock(0,0,0,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(1,0,0,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(1,0,1,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(0,0,1,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(0,1,0,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(1,1,0,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(1,1,1,block.DIAMOND_BLOCK.id),
-                  ShapeBlock(0,1,1,block.DIAMOND_BLOCK.id)]
-    
-    #move the shape about
-    myShape = MinecraftShape(mc, playerPos, shapeBlocks)
-    print("drawn shape")
-    time.sleep(10)
-    myShape.moveBy(-1,1,-1)
-    time.sleep(1)
-    myShape.moveBy(1,0,1)
-    time.sleep(1)
-    myShape.moveBy(1,1,0)
-    time.sleep(1)
+    def home(self):
+        self.position.x = self.startposition.x
+        self.position.y = self.startposition.y
+        self.position.z = self.startposition.z
 
-    #rotate the shape
-    myShape.rotate(90,0,0)
-    
-    #clear the shape
-    myShape.clear()
+    def pendown(self):
+        self._pendown = True
+
+    def penup(self):
+        self._pendown = False
+
+    def isdown(self):
+        return self.pendown
+
+    def fly(self):
+        self.flying = True
+
+    def walk(self):
+        self.flying = False
+        self.verticalheading = 0
+
+    def penblock(self, blockId, blockData=0):
+        self._penblock = block.Block(blockId, blockData)
+
+    def speed(self, turtlespeed):
+        self.turtlespeed = turtlespeed
+
+    def _drawTurtle(self, x, y, z):
+        # draw turtle
+        self.mcDrawing.drawPoint3d(x, y, z, self.turtleblock.id, self.turtleblock.data)
+        lastDrawnTurtle = minecraft.Vec3(x, y, z)
+
+    def _clearTurtle(self, x, y, z):
+        # clear turtle
+        self.mcDrawing.drawPoint3d(x, y, z, block.AIR.id)
+
+    def _findTargetBlock(self, turtleX, turtleY, turtleZ, heading, verticalheading, distance):
+        x, y, z = self._findPointOnSphere(turtleX, turtleY, turtleZ, heading, verticalheading, distance)
+        x = int(round(x, 0))
+        y = int(round(y, 0))
+        z = int(round(z, 0))
+        return x, y, z
+
+    def _findPointOnSphere(self, cx, cy, cz, horizontalAngle, verticalAngle, radius):
+        x = cx + (radius * (math.cos(math.radians(verticalAngle)) * math.cos(math.radians(horizontalAngle))))
+        y = cy + (radius * (math.sin(math.radians(verticalAngle))))
+        z = cz + (radius * (math.cos(math.radians(verticalAngle)) * math.sin(math.radians(horizontalAngle))))
+        return x, y, z
+
+    def _roundXYZ(x, y, z):
+        return int(round(x, 0)), int(round(y, 0)), int(round(z, 0))
+
+    def _roundVec3(position):
+        return minecraft.vec3(int(position.x), int(position.y), int(position.z))
+
