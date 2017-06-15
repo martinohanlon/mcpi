@@ -15,6 +15,16 @@ from copy import deepcopy
 import time
 import math
 
+class Points():
+    def __init__(self):
+        self._points = []
+
+    def add(self, x, y, z):
+        self._points.append(minecraft.Vec3(x, y, z))
+
+    def getVec3s(self):
+        return self._points
+    
 class MinecraftDrawing:
     """
     MinecraftDrawing - a class of 'useful' drawing functions
@@ -35,6 +45,10 @@ class MinecraftDrawing:
         draws a face, when passed a collection of vertices which make up a polyhedron
         """
         
+        # was a Points class passed?  If so get the list of Vec3s.
+        if isinstance(vertices, Points):
+            vertices = vertices.getVec3s()  
+
         # get the edges of the face
         edgesVertices = []
         # persist the first vertex
