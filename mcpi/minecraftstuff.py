@@ -11,23 +11,43 @@ except ImportError:
     import block
     import util
 
-from copy import deepcopy
 import time
 import math
 
 class Points():
+    """
+    Points - a collection of minecraft positions or Vec3's. Used when drawing faces ``MinecraftDrawing.drawFace()``.
+    """
     def __init__(self):
         self._points = []
 
     def add(self, x, y, z):
+        """
+        add a single position to the list of points.
+
+        :param int x:
+            The x position.
+
+        :param int y:
+            The y position.
+
+        :param int z:
+            The z position.
+        """
         self._points.append(minecraft.Vec3(x, y, z))
 
     def getVec3s(self):
+        """
+        returns a list of Vec3 positions
+        """
         return self._points
     
 class MinecraftDrawing:
     """
-    MinecraftDrawing - a class of 'useful' drawing functions
+    MinecraftDrawing - a class of useful drawing functions
+
+    :param mcpi.minecraft.Minecraft mc:
+        A Minecraft object which is connected to a world. 
     """
     def __init__(self, mc):
         self.mc = mc
@@ -35,6 +55,21 @@ class MinecraftDrawing:
     def drawPoint3d(self, x, y, z, blockType, blockData=0):
         """
         draws a single point in Minecraft, i.e. 1 block
+
+        :param int x:
+            The x position.
+
+        :param int y:
+            The y position.
+
+        :param int z:
+            The z position.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         
         self.mc.setBlock(x,y,z,blockType,blockData)
@@ -43,6 +78,19 @@ class MinecraftDrawing:
     def drawFace(self, vertices, filled, blockType, blockData=0):
         """
         draws a face, when passed a collection of vertices which make up a polyhedron
+
+        :param list vertices:
+            The a list of points, passed as either a ``minecraftstuff.Points`` object 
+            or as a list of ``mcpi.minecraft.Vec3`` objects.
+
+        :param boolean filled:
+            If ``True`` fills the face with blocks.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         
         # was a Points class passed?  If so get the list of Vec3s.
@@ -94,13 +142,47 @@ class MinecraftDrawing:
     def drawVertices(self, vertices, blockType, blockData=0):
         """
         draws all the points in a collection of vertices with a block
+
+        :param list vertices:
+            A list of ``mcpi.minecraft.Vec3`` objects.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
+
         for vertex in vertices:
             self.drawPoint3d(vertex.x, vertex.y, vertex.z, blockType, blockData)
 
     def drawLine(self, x1, y1, z1, x2, y2, z2, blockType, blockData=0):
         """
         draws a line between 2 points
+
+        :param int x1:
+            The x position of the first point.
+
+        :param int y1:
+            The y position of the first point.
+
+        :param int z1:
+            The z position of the first point.
+
+        :param int x2:
+            The x position of the second point.
+
+        :param int y2:
+            The y position of the second point.
+
+        :param int z2:
+            The z position of the second point.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         self.drawVertices(self.getLine(x1, y1, z1, x2, y2, z2), blockType, blockData)
 
@@ -108,6 +190,24 @@ class MinecraftDrawing:
     def drawSphere(self, x1, y1, z1, radius, blockType, blockData=0):
         """
         draws a sphere around a point to a radius
+
+        :param int x1:
+            The x position of the centre of the sphere.
+
+        :param int y1:
+            The y position of the centre of the sphere.
+
+        :param int z1:
+            The z position of the centre of the sphere.
+
+        :param int radius:
+            The radius of the sphere.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         for x in range(radius * -1, radius):
             for y in range(radius * -1, radius):
@@ -117,7 +217,25 @@ class MinecraftDrawing:
 
     def drawHollowSphere(self, x1, y1, z1, radius, blockType, blockData=0):
         """
-        draws a hollow sphere around a point to a radius, sphere has to bigger enough to be hollow!
+        draws a hollow sphere around a point to a radius, sphere has to big enough to be hollow!
+
+        :param int x1:
+            The x position of the centre of the sphere.
+
+        :param int y1:
+            The y position of the centre of the sphere.
+
+        :param int z1:
+            The z position of the centre of the sphere.
+
+        :param int radius:
+            The radius of the sphere.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         for x in range(radius * -1, radius):
             for y in range(radius * -1, radius):
@@ -128,6 +246,24 @@ class MinecraftDrawing:
     def drawCircle(self, x0, y0, z, radius, blockType, blockData=0):
         """
         draws a circle in the Y plane (i.e. vertically)
+
+        :param int x0:
+            The x position of the centre of the circle.
+
+        :param int y0:
+            The y position of the centre of the circle.
+
+        :param int z:
+            The z position of the centre of the circle.
+
+        :param int radius:
+            The radius of the sphere.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
         
         f = 1 - radius
@@ -161,6 +297,24 @@ class MinecraftDrawing:
     def drawHorizontalCircle(self, x0, y, z0, radius, blockType, blockData=0):
         """
         draws a circle in the X plane (i.e. horizontally)
+
+        :param int x0:
+            The x position of the centre of the circle.
+
+        :param int y:
+            The y position of the centre of the circle.
+
+        :param int z0:
+            The z position of the centre of the circle.
+
+        :param int radius:
+            The radius of the circle.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
         """
 
         f = 1 - radius
@@ -195,6 +349,24 @@ class MinecraftDrawing:
         Returns all the points which would make up a line between 2 points as a list
 
         3d implementation of bresenham line algorithm
+
+        :param int x1:
+            The x position of the first point.
+
+        :param int y1:
+            The y position of the first point.
+
+        :param int z1:
+            The z position of the first point.
+
+        :param int x2:
+            The x position of the second point.
+
+        :param int y2:
+            The y position of the second point.
+
+        :param int z2:
+            The z position of the second point.
         """
         # return the maximum of 2 values
         def MAX(a,b):
@@ -293,12 +465,25 @@ class MinecraftDrawing:
 # MinecraftShape - a class for managing shapes
 class MinecraftShape:
     """
-    MinecraftShape
+    MinecraftShape - the implementation of a 'shape' in Minecraft.
 
-    The implementation of a 'shape' in Minecraft.
     Each shape consists of one or many blocks with a position relative to each other.
+    
     Shapes can be transformed by movement and rotation.
+    
     When a shape is changed and redrawn in Minecraft only the blocks which have changed are updated.
+
+    :param mcpi.minecraft.Minecraft mc:
+        A Minecraft object which is connected to a world.
+
+    :param mcpi.minecraft.Vec3 position:
+        The position where the shape should be created
+
+    :param list shapeBlocks:
+        A list of ShapeBlocks which make up the shape. This defaults to ``None``.
+
+    :param bool visible:
+        Where the shape should be visible. This defaults to ``True``.
     """
      
     def __init__(self, mc, position, shapeBlocks = None, visible = True):
@@ -327,8 +512,8 @@ class MinecraftShape:
 
     def draw(self):
         """
-        draws the shape in Minecraft
-        taking into account where it was last drawn and only updates the blocks which have changed
+        draws the shape in Minecraft, taking into account where it was last drawn, 
+        only updating the blocks which have changed
         """
 
         #create 2 sets only of the blocks which are drawn and one of the shapeBlocks
@@ -347,12 +532,12 @@ class MinecraftShape:
             self.mc.setBlock(blockToDraw.actualPos.x, blockToDraw.actualPos.y, blockToDraw.actualPos.z, blockToDraw.blockType, blockToDraw.blockData)
 
         #update the blocks which have been drawn
-        self.drawnShapeBlocks = deepcopy(self.shapeBlocks)
+        self.drawnShapeBlocks = self._copyBlocks(self.shapeBlocks)
         self.visible = True
 
     def redraw(self):
         """
-        draws the shape in Minecraft, by clearing all the blocks and redrawing them 
+        redraws the shape in Minecraft, by clearing all the blocks and redrawing them 
         """
         if self.drawnShapeBlocks != None:
             for blockToClear in self.drawnShapeBlocks:
@@ -362,7 +547,7 @@ class MinecraftShape:
             self.mc.setBlock(blockToDraw.actualPos.x, blockToDraw.actualPos.y, blockToDraw.actualPos.z, blockToDraw.blockType, blockToDraw.blockData)
 
         #update the blocks which have been drawn
-        self.drawnShapeBlocks = deepcopy(self.shapeBlocks)
+        self.drawnShapeBlocks = self._copyBlocks(self.shapeBlocks)
         self.visible = True
 
     def clear(self):
@@ -390,12 +575,31 @@ class MinecraftShape:
     def moveBy(self, x, y, z):
         """
         moves the position of the shape by x,y,z
+        
+        :param int x:
+            The number of blocks to move in x.
+
+        :param int y:
+            The number of blocks to move in y.
+
+        :param int z:
+            The number of blocks to move in z.
+
         """
         return self._move(self.position.x + x, self.position.y + y, self.position.z + z)
 
     def move(self, x, y, z):
         """
         moves the position of the shape to x,y,z
+
+        :param int x:
+            The x position.
+
+        :param int y:
+            The y position.
+
+        :param int z:
+            The z position.
         """
         #is the position different
         if self.position.x != x or self.position.y != y or self.position.z != z:
@@ -426,17 +630,30 @@ class MinecraftShape:
         
         if self.visible:
             self.draw()
+    
+    def _copyBlocks(self, shapeBlocks):
+        """
+        Internal. copy a list of shapeBlocks to new objects, item level, as
+        opposed to the expensive copy.deepcopy() or copy.copy()
+        """
+        newShapeBlocks = []
+        for shapeBlock in shapeBlocks:
+            newShapeBlock = ShapeBlock(shapeBlock.actualPos.x, shapeBlock.actualPos.y, shapeBlock.actualPos.z, shapeBlock.blockType, shapeBlock.blockData, shapeBlock.tag)
+            newShapeBlock.originalPos = minecraft.Vec3(shapeBlock.originalPos.x, shapeBlock.originalPos.y, shapeBlock.originalPos.z)
+            newShapeBlock.relativePos = minecraft.Vec3(shapeBlock.relativePos.x, shapeBlock.relativePos.y, shapeBlock.relativePos.z)
+            newShapeBlocks.append(newShapeBlock)
+        return newShapeBlocks
 
     def _recalcBlocks(self):
         """
-        recalculate the position of all of the blocks in a shape
+        Internal. recalculate the position of all of the blocks in a shape
         """
         for shapeBlock in self.shapeBlocks:
             self._recalcBlock(shapeBlock)
             
     def _recalcBlock(self, shapeBlock):
         """
-        recalulate the shapeBlock's position based on its relative position,
+        Internal. recalulate the shapeBlock's position based on its relative position,
          its actual position in the world and its rotation
         """
         #reset the block's position before recalcing it
@@ -451,6 +668,15 @@ class MinecraftShape:
     def rotate(self, yaw, pitch, roll):
         """
         sets the rotation of a shape by yaw, pitch and roll
+
+        :param float yaw:
+            The yaw rotation in degrees.
+
+        :param float pitch:
+            The pitch rotation in degrees.
+
+        :param float roll:
+            The roll rotation in degrees.        
         """
         #is the rotation different?
         if yaw != self.yaw or pitch != self.pitch or roll != self.roll:
@@ -474,12 +700,21 @@ class MinecraftShape:
     def rotateBy(self, yaw, pitch, roll):
         """
         increments the rotation of a shape by yaw, pitch and roll
+
+        :param float yaw:
+            The yaw rotation in degrees.
+
+        :param float pitch:
+            The pitch rotation in degrees.
+
+        :param float roll:
+            The roll rotation in degrees.
         """
         return self.rotate(self.yaw + yaw, self.pitch + pitch, self.roll + roll)
         
     def _moveShapeBlock(self, shapeBlock, x, y, z):
         """
-        offset the position of the block by the position
+        Internal. offset the position of the block by the position
         """
         shapeBlock.actualPos.x = shapeBlock.relativePos.x + x
         shapeBlock.actualPos.y = shapeBlock.relativePos.y + y
@@ -487,7 +722,7 @@ class MinecraftShape:
 
     def _rotateShapeBlock(self, shapeBlock, yaw, pitch, roll):
         """
-        rotate the block
+        Internal. rotate the block
         """
         self._rotateShapeBlockY(shapeBlock, yaw)
         self._rotateShapeBlockZ(shapeBlock, roll)
@@ -496,7 +731,7 @@ class MinecraftShape:
 
     def _rotateShapeBlockY(self, shapeBlock, theta):
         """
-        rotate y = yaw (direction)
+        Internal. rotate y = yaw (direction)
         """
         if theta != 0:
             sin_t = math.sin(math.radians(theta))
@@ -508,7 +743,7 @@ class MinecraftShape:
         
     def _rotateShapeBlockZ(self, shapeBlock, theta):
         """
-        rotate z = roll
+        Internal. rotate z = roll
         """
         if theta != 0:
             sin_t = math.sin(math.radians(theta))
@@ -520,7 +755,7 @@ class MinecraftShape:
         
     def _rotateShapeBlockX(self, shapeBlock, theta):
         """
-        rotate x = pitch
+        Internal. rotate x = pitch
         """
         if theta != 0:
             sin_t = math.sin(math.radians(theta))
@@ -532,7 +767,28 @@ class MinecraftShape:
 
     def setBlock(self, x, y, z, blockType, blockData = 0, tag = ""):
         """
-        sets one block in the shape and redraws it 
+        sets one block in the shape and redraws it
+
+        draws a single point in Minecraft, i.e. 1 block
+
+        :param int x:
+            The x position.
+
+        :param int y:
+            The y position.
+
+        :param int z:
+            The z position.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
+
+        :param string tag:
+            A tag for the block, this is useful for grouping blocks together and keeping 
+            track of them as the position of blocks can change, defaults to ``""``. 
         """
         self._setBlock(x, y, z, blockType, blockData, tag)
 
@@ -561,6 +817,34 @@ class MinecraftShape:
     def setBlocks(self, x1, y1, z1, x2, y2, z2, blockType, blockData = 0, tag = ""):
         """
         creates a cuboid of blocks in the shape and redraws it
+
+        :param int x1:
+            The x position of the first point.
+
+        :param int y1:
+            The y position of the first point.
+
+        :param int z1:
+            The z position of the first point.
+
+        :param int x2:
+            The x position of the second point.
+
+        :param int y2:
+            The y position of the second point.
+
+        :param int z2:
+            The z position of the second point.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
+
+        :param string tag:
+            A tag for the block, this is useful for grouping blocks together and keeping 
+            track of them as the position of blocks can change, defaults to ``""``. 
         """
         #order x, y, z's
         if x1 > x2: x1, x2 = x2, x1
@@ -579,7 +863,16 @@ class MinecraftShape:
 
     def getShapeBlock(self, x, y, z):
         """
-        returns the shape block for an 'actual position'        
+        returns the ShapeBlock for an 'actual position'  
+
+        :param int x:
+            The x position.
+
+        :param int y:
+            The y position.
+
+        :param int z:
+            The z position.
         """
         #does the block exist?
         for shapeBlock in self.shapeBlocks:
@@ -592,8 +885,26 @@ class MinecraftShape:
 # a class created to manage a block within a shape
 class ShapeBlock():
     """
-    ShapeBlock
-    a class to hold one block within a shape
+    ShapeBlock - a class to hold one block within a shape
+
+    :param int x:
+        The x position.
+
+    :param int y:
+        The y position.
+
+    :param int z:
+        The z position.
+
+    :param int blockType:
+        The block id.
+
+    :param int blockData:
+        The block data value, defaults to ``0``.
+
+    :param string tag:
+        A tag for the block, this is useful for grouping blocks together and keeping 
+        track of them as the position of blocks can change, defaults to ``""``. 
     """
     def __init__(self, x, y, z, blockType, blockData = 0, tag = ""):
         #persist data
@@ -631,6 +942,16 @@ class ShapeBlock():
             return (self.actualPos.x, self.actualPos.y, self.actualPos.z, self.blockType, self.blockData) == (other.actualPos.x, other.actualPos.y, other.actualPos.z, other.blockType, other.blockData)
 
 class MinecraftTurtle:
+    """
+    MinecraftTurle - a graphics turtle, which can be used to create 'things' in Minecraft by 
+    controlling its position, angles and direction
+
+    :param mcpi.minecraft.Minecraft mc:
+        A Minecraft object which is connected to a world.
+
+    :param mcpi.minecraft.Vec3 position:
+        The position where the shape should be created, defaults to ``0,0,0``.
+    """
 
     SPEEDTIMES = {0: 0, 10: 0.1, 9: 0.2, 8: 0.3, 7: 0.4, 6: 0.5, 5: 0.6, 4: 0.7, 3: 0.8, 2: 0.9, 1: 1}
 
@@ -662,6 +983,12 @@ class MinecraftTurtle:
         self._drawTurtle(int(self.position.x), int(self.position.y), int(self.position.y))
 
     def forward(self, distance):
+        """
+        move the turtle forward
+
+        :param int distance:
+            the number of blocks to move.
+        """
         # get end of line
         # x,y,z = self._findTargetBlock(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading, distance)
         x, y, z = self._findPointOnSphere(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading, distance)
@@ -669,6 +996,12 @@ class MinecraftTurtle:
         self._moveTurtle(x, y, z)
 
     def backward(self, distance):
+        """
+        move the turtle backward
+
+        :param int distance:
+            the number of blocks to move.
+        """
         # move turtle backward
         # get end of line
         # x,y,z = self._findTargetBlock(self.position.x, self.position.y, self.position.z, self.heading, self.verticalheading - 180, distance)
@@ -719,18 +1052,36 @@ class MinecraftTurtle:
             self._drawTurtle(targetX, targetY, targetZ)
 
     def right(self, angle):
+        """
+        rotate the turtle right
+
+        :param float angle:
+            the angle in degrees to rotate.
+        """
         # rotate turtle angle to the right
         self.heading = self.heading + angle
         if self.heading > 360:
             self.heading = self.heading - 360
 
     def left(self, angle):
+        """
+        rotate the turtle left
+
+        :param float angle:
+            the angle in degrees to rotate.
+        """
         # rotate turtle angle to the left
         self.heading = self.heading - angle
         if self.heading < 0:
             self.heading = self.heading + 360
 
     def up(self, angle):
+        """
+        rotate the turtle up
+
+        :param float angle:
+            the angle in degrees to rotate.
+        """        
         # rotate turtle angle up
         self.verticalheading = self.verticalheading + angle
         if self.verticalheading > 360:
@@ -740,6 +1091,12 @@ class MinecraftTurtle:
             self.flying = True
 
     def down(self, angle):
+        """
+        rotate the turtle down
+
+        :param float angle:
+            the angle in degrees to rotate.
+        """
         # rotate turtle angle down
         self.verticalheading = self.verticalheading - angle
         if self.verticalheading < 0:
@@ -749,15 +1106,45 @@ class MinecraftTurtle:
             self.flying = True
 
     def setx(self, x):
+        """
+        set the turtle's x position
+
+        :param int x:
+            the x position.
+        """
         self.setposition(x, self.position.y, self.position.z)
 
     def sety(self, y):
+        """
+        set the turtle's y position
+
+        :param int y:
+            the y position.
+        """
         self.setposition(self.position.x, y, self.position.z)
 
     def setz(self, z):
+        """
+        set the turtle's z position
+
+        :param int z:
+            the z position.
+        """
         self.setposition(self.position.x, self.position.y, z)
 
     def setposition(self, x, y, z):
+        """
+        set the turtle's position
+
+        :param int x:
+            the x position.
+
+        :param int y:
+            the y position.
+
+        :param int z:
+            the z position.
+        """
         # clear the turtle
         if self.showturtle:
             self._clearTurtle(self.position.x, self.position.y, self.position.z)
@@ -770,39 +1157,85 @@ class MinecraftTurtle:
             self._drawTurtle(self.position.x, self.position.y, self.position.z)
 
     def setheading(self, angle):
+        """
+        set the turtle's horizontal heading
+
+        :param float angle:
+            the angle in degrees.
+        """
         self.heading = angle
 
     def setverticalheading(self, angle):
+        """
+        set the turtle's verticle heading
+
+        :param float angle:
+            the angle in degrees.
+        """
         self.verticalheading = angle
         # turn flying on
         if not self.flying:
             self.flying = True
 
     def home(self):
+        """
+        reset the turtle's position
+        """
         self.position.x = self.startposition.x
         self.position.y = self.startposition.y
         self.position.z = self.startposition.z
 
     def pendown(self):
+        """
+        put the turtles pen down, show it will draw
+        """
         self._pendown = True
 
     def penup(self):
+        """
+        put the turtles pen up, show it wont draw
+        """
         self._pendown = False
 
     def isdown(self):
+        """
+        returns ``True`` if the pen is down
+        """
         return self.pendown
 
     def fly(self):
+        """
+        sets the turtle to 'fly', i.e. not have to move along the ground.
+        """
         self.flying = True
 
     def walk(self):
+        """
+        sets the turtle to 'walk', i.e. it has to move along the ground.
+        """
         self.flying = False
         self.verticalheading = 0
 
     def penblock(self, blockId, blockData=0):
+        """
+        set the block the turtle uses as its pen.
+
+        :param int blockType:
+            The block id.
+
+        :param int blockData:
+            The block data value, defaults to ``0``.
+        """
         self._penblock = block.Block(blockId, blockData)
 
     def speed(self, turtlespeed):
+        """
+        set the turtle's speed.
+
+        :param int turtlespeed:
+            ``1`` - ``10``, 1 being the slowest, 10 being the fastest, defaults to ``6``. 
+            When set to ``0`` the turtle draws instantaneously.
+        """
         self.turtlespeed = turtlespeed
 
     def _drawTurtle(self, x, y, z):
