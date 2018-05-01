@@ -30,7 +30,7 @@ Documentation for the Minecraft: Pi edition and RaspberryJuice API's can be foun
 
 It was released onto [PyPI](https://pypi.org) in May 2018.
 
-If you want some cool additional tools for modifying Minecraft, check out [minecraft-stuff](https://minecraft-stuff.readthedocs.io/en/latest/)
+If you want some cool additional tools for modifying Minecraft, check out [minecraft-stuff](https://minecraft-stuff.readthedocs.io/en/latest/).
 
 ## Sources
 
