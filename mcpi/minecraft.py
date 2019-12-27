@@ -1,4 +1,4 @@
-from .connection import Connection
+from .connection import Connection, RequestError
 from .vec3 import Vec3
 from .event import BlockEvent, ChatEvent
 from .block import Block
@@ -203,6 +203,22 @@ class Minecraft:
     @staticmethod
     def create(address = "localhost", port = 4711):
         return Minecraft(Connection(address, port))
+
+    @staticmethod
+    def connectedPlayers(address = "localhost", port = 4711):
+        conn = Connection(address, port)
+        name_by_id = {}
+        try:
+            ids = conn.sendReceive(b'world.getPlayerIds')
+            ids = list(map(int, ids.split("|")))
+        except RequestError:
+            return name_by_id
+
+        for i in ids:
+            name = conn.sendReceive(b'entity.getName', i)
+            name_by_id[i] = name
+
+        return name_by_id
 
 
 if __name__ == "__main__":
