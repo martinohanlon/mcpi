@@ -11,8 +11,9 @@ def flatten_parameters_to_bytestring(l):
 
 def _misc_to_bytes(m):
     """
-    Convert an arbitrary object into a string encoded as a CP437 series of bytes.
+    Convert an arbitrary object into a string encoded as a UTF-8 series of bytes. 
 
     See `Connection.send` for more details.
     """
-    return str(m).encode("cp437")
+
+    return str(m).encode("UTF-8")

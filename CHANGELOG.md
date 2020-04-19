@@ -1,5 +1,9 @@
 # Change Log
 
+## 2020-04-19 v1.2.0
+
++ Brought up to date with latest version of RaspberryJuice 1.12.1
+
 ## 2018-05-01 v1.1.0 
 
 + packaged and released onto [PyPI](https://pypi.org)
