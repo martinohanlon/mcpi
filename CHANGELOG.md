@@ -1,5 +1,9 @@
 # Change Log
 
+## 2021-10-31 v1.2.1
+
++ Python 3.10 compatibility fix
+
 ## 2020-04-19 v1.2.0
 
 + Brought up to date with latest version of RaspberryJuice 1.12.1

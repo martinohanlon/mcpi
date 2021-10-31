@@ -2,7 +2,7 @@ from setuptools import setup
 
 __project__ = 'mcpi'
 __desc__ = 'Python library for the Minecraft Pi edition and RaspberryJuice API'
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 __author__ = "Martin O'Hanlon"
 __author_email__ = 'martin@ohanlonweb.com'
 __license__ = 'MIT'
@@ -30,6 +30,8 @@ __classifiers__ = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 
 setup(name=__project__,
