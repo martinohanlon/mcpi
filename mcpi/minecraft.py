@@ -329,7 +329,9 @@ class Minecraft:
     def getPlayerEntityIds(self):
         """Get the entity ids of the connected players => [id:int]"""
         ids = self.conn.sendReceive(b"world.getPlayerIds")
-        return list(map(int, ids.split("|")))
+        if ids:
+            return list(map(int, ids.split("|")))
+        return []
 
     def getPlayerEntityId(self, name):
         """Get the entity id of the named player => [id:int]"""
