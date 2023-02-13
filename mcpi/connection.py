@@ -12,10 +12,11 @@ class Connection:
     """Connection to a Minecraft Pi game"""
     RequestFailed = "Fail"
 
-    def __init__(self, address, port):
+    def __init__(self, address, port, encoding):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((address, port))
         self.lastSent = ""
+        self.encoding = encoding
 
     def drain(self):
         """Drains the socket of incoming data"""
@@ -51,7 +52,7 @@ class Connection:
 
     def receive(self):
         """Receives data. Note that the trailing newline '\n' is trimmed"""
-        s = self.socket.makefile("r").readline().rstrip("\n")
+        s = self.socket.makefile("r", encoding=self.encoding).readline().rstrip("\n")
         if s == Connection.RequestFailed:
             raise RequestError("%s failed"%self.lastSent.strip())
         return s

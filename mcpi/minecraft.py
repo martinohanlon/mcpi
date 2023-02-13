@@ -372,8 +372,8 @@ class Minecraft:
         return int(self.conn.sendReceive(b"world.removeEntities", typeId))
 
     @staticmethod
-    def create(address = "localhost", port = 4711):
-        return Minecraft(Connection(address, port))
+    def create(address = "localhost", port = 4711, encoding = "utf-8"):
+        return Minecraft(Connection(address, port, encoding))
 
 
 if __name__ == "__main__":
